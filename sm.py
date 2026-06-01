@@ -79,7 +79,8 @@ class Tetris:
         self.words = ["BOOM!", "COOL!", "GOOD!", "GREAT!", "WOW!", "NICE!", "SUPER!"]
         self.effects = []
 
-    def check_borders(self, i):
+    def check_borders(self, i):#чи не виліз блок за лівий край;чи не виліз за правий край;чи не впав нижче поля;чи не врізався в інший блок.
+
         if self.figure[i].x < 0 or self.figure[i].x > W - 1:
             return False
         if self.figure[i].y > H - 1:
@@ -134,7 +135,7 @@ class Tetris:
                     if hasattr(self, "restart_rect") and self.restart_rect.collidepoint(event.pos):
                         self.reset_game()
 
-    def move_x(self):
+    def move_x(self):#рух по горизонталі
         old = deepcopy(self.figure)
 
         for i in range(4):
@@ -145,7 +146,7 @@ class Tetris:
 
         self.dx = 0
 
-    def move_y(self):
+    def move_y(self):#рух вниз
         self.anim_count = 0
         old = deepcopy(self.figure)
 
@@ -164,7 +165,7 @@ class Tetris:
                 self.next_color = choice(COLORS)
                 break
 
-    def rotate(self):
+    def rotate(self):#поворот
         center = self.figure[0]
         old = deepcopy(self.figure)
 
@@ -179,7 +180,7 @@ class Tetris:
                 self.figure = old
                 break
 
-    def check_lines(self):
+    def check_lines(self):#перевіряє повні рядки
         line = H - 1
         lines = 0
 
