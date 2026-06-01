@@ -51,8 +51,10 @@ class Tetris:
 
         self.clock = pygame.time.Clock()
         self.font = pygame.font.SysFont("Arial", 40, bold=True)
+        self.small_font = pygame.font.SysFont("Arial", 30, bold=True)
 
         self.reset_game()
+        self.start_screen = True  # Показуємо стартовий екран
 
     def reset_game(self):
         self.field = [[0 for _ in range(W)] for _ in range(H)]
@@ -94,10 +96,20 @@ class Tetris:
                 exit()
 
             if event.type == pygame.KEYDOWN:
-
                 if event.key == pygame.K_ESCAPE:
                     pygame.quit()
                     exit()
+
+            # Якщо ми на стартовому екрані
+            if self.start_screen:
+                if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
+                    if hasattr(self, "start_button_rect") and self.start_button_rect.collidepoint(event.pos):
+                        self.start_screen = False  # Починаємо гру
+                        self.reset_game()  # Повне скидання перед грою
+                continue  # Ігноруємо все інше на стартовому екрані
+
+            # Управління грою (тільки якщо гра запущена)
+            if event.type == pygame.KEYDOWN:
 
                 if event.key == pygame.K_p:
                     self.paused = not self.paused
@@ -220,11 +232,66 @@ class Tetris:
 
         text = self.font.render("RESTART", True, (255, 255, 255))
         self.sc.blit(text, (self.restart_rect.x + 40, self.restart_rect.y + 10))
+
+    def draw_start_screen(self):
+        """Малює початковий екран із заголовком та кнопкою"""
+        # Затемнення фону
+        overlay = pygame.Surface(GAME_RES)
+        overlay.set_alpha(180)
+        overlay.fill((0, 0, 0))
+        self.sc.blit(overlay, (0, 0))
+
+        # Назва гри
+        title_font = pygame.font.SysFont("Arial", 70, bold=True)
+        title_text = title_font.render("TETRIS", True, (255, 255, 255))
+        title_rect = title_text.get_rect(center=(GAME_RES[0] // 2, GAME_RES[1] // 2 - 120))
+        self.sc.blit(title_text, title_rect)
+
+        # Кнопка "START THE GAME"
+        self.start_button_rect = pygame.Rect(
+            GAME_RES[0] // 2 - 140,
+            GAME_RES[1] // 2 + 20,
+            280,
+            70
+        )
+
+        # Анімація кнопки (зміна кольору при наведенні)
+        mouse_pos = pygame.mouse.get_pos()
+        if self.start_button_rect.collidepoint(mouse_pos):
+            button_color = (100, 100, 140)
+        else:
+            button_color = (60, 60, 90)
+
+        pygame.draw.rect(self.sc, button_color, self.start_button_rect, border_radius=15)
+        pygame.draw.rect(self.sc, (150, 150, 180), self.start_button_rect, 3, border_radius=15)
+
+        # Текст кнопки
+        button_font = pygame.font.SysFont("Arial", 35, bold=True)
+        button_text = button_font.render("START THE GAME", True, (255, 255, 255))
+        text_rect = button_text.get_rect(center=self.start_button_rect.center)
+        self.sc.blit(button_text, text_rect)
+
+        # Інструкція
+        hint_font = pygame.font.SysFont("Arial", 20)
+        hint_text = hint_font.render("Click the button to start", True, (200, 200, 200))
+        hint_rect = hint_text.get_rect(center=(GAME_RES[0] // 2, GAME_RES[1] // 2 + 120))
+        self.sc.blit(hint_text, hint_rect)
+
     def run(self):
 
         while True:
-            self.sc.fill(BG_COLOR)
             self.control()
+
+            # Якщо на стартовому екрані - малюємо заставку
+            if self.start_screen:
+                self.sc.fill(BG_COLOR)
+                self.draw_start_screen()
+                pygame.display.flip()
+                self.clock.tick(FPS)
+                continue
+
+            # Основний ігровий цикл
+            self.sc.fill(BG_COLOR)
 
             if self.game_over:
                 overlay = pygame.Surface(GAME_RES)
@@ -235,7 +302,6 @@ class Tetris:
                 t1 = self.font.render("GAME OVER", True, (255, 60, 60))
                 self.sc.blit(t1, (GAME_RES[0] // 2 - t1.get_width() // 2, GAME_RES[1] // 2 - 140))
 
-                # ✅ кнопка має малюватись ДО flip
                 self.draw_restart_button()
 
                 pygame.display.flip()
