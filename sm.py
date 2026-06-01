@@ -79,8 +79,7 @@ class Tetris:
         self.words = ["BOOM!", "COOL!", "GOOD!", "GREAT!", "WOW!", "NICE!", "SUPER!"]
         self.effects = []
 
-    def check_borders(self, i):#чи не виліз блок за лівий край;чи не виліз за правий край;чи не впав нижче поля;чи не врізався в інший блок.
-
+    def check_borders(self, i):
         if self.figure[i].x < 0 or self.figure[i].x > W - 1:
             return False
         if self.figure[i].y > H - 1:
@@ -165,7 +164,7 @@ class Tetris:
                 self.next_color = choice(COLORS)
                 break
 
-    def rotate(self):# повертає фігуру
+    def rotate(self):
         center = self.figure[0]
         old = deepcopy(self.figure)
 
@@ -180,7 +179,7 @@ class Tetris:
                 self.figure = old
                 break
 
-    def check_lines(self):# перевіряє повні рядки
+    def check_lines(self):
         line = H - 1
         lines = 0
 
@@ -364,3 +363,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+
